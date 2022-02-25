@@ -15,7 +15,8 @@ import {
   ThunderboltOutlined
 } from '@ant-design/icons';
 
-import { useGetCryptoDetailsQuery } from '../service/cryptoApi';
+import { useGetCryptoDetailsQuery, useGetCryptoHistoryQuery } from '../service/cryptoApi';
+import LineChart from './LineChart';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -23,9 +24,10 @@ const { Option } = Select;
 const CryptoDetails = () => {
   const { coinId } = useParams();
   const [timePeriod, setTimePeriod] = useState('7d');
-  const { data, isFetching } = useGetCryptoDetailsQuery(coinId);
+  const { data, isFetching: isFetchingCryptoDet } = useGetCryptoDetailsQuery(coinId);
+  const { data: coinHistory, isFetching: isFetchingHist } = useGetCryptoHistoryQuery({ coinId, timePeriod });
 
-  if(isFetching) return 'Loading...';
+  if(isFetchingCryptoDet && isFetchingHist) return 'Loading...';
 
   const cryptoDetails = data?.data?.coin;
 
@@ -64,7 +66,7 @@ const CryptoDetails = () => {
       >
         {time.map((date) => <Option key={date}>{date}</Option>)}
       </Select>
-      {/**/}
+      <LineChart coinHistory={coinHistory} currentPrice={millify(cryptoDetails.price)} coinName={cryptoDetails.name} />
       <Col className='stats-container'>
         <Col className='coin-value-statistic'>
           <Col className='coin-value-statistic-heading'>
@@ -102,6 +104,29 @@ const CryptoDetails = () => {
               </Col>
               <Text className='stats'>{value}</Text>
             </Col>
+          ))}
+        </Col>
+      </Col>
+      <Col className='coin-desc-link'>
+        <Row className='coin-desc'>
+          <Title title={3} className='coin-details-heading'>
+            What is {cryptoDetails.name}
+            {HTMLReactParser(cryptoDetails.description)}
+          </Title>
+        </Row>
+        <Col className='coin-links'>
+          <Title level={3} className='coin-details-heading'>
+            {cryptoDetails.name} links
+          </Title>
+          {cryptoDetails.links.map((link) => (
+            <Row className='coin-link' key={link.name}>
+              <Title level={5} className='link-name'>
+                {link.type}
+              </Title>
+              <a href={link.url} target='_blank' rel='noreferrer'>
+                {link.name}
+              </a>
+            </Row>
           ))}
         </Col>
       </Col>
