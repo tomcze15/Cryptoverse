@@ -17,6 +17,7 @@ import {
 
 import { useGetCryptoDetailsQuery, useGetCryptoHistoryQuery } from '../service/cryptoApi';
 import LineChart from './LineChart';
+import Loader from './Loader';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -27,7 +28,7 @@ const CryptoDetails = () => {
   const { data, isFetching: isFetchingCryptoDet } = useGetCryptoDetailsQuery(coinId);
   const { data: coinHistory, isFetching: isFetchingHist } = useGetCryptoHistoryQuery({ coinId, timeperiod });
 
-  if(isFetchingCryptoDet && isFetchingHist) return 'Loading...';
+  if(isFetchingCryptoDet && isFetchingHist) return <Loader />
 
   const cryptoDetails = data?.data?.coin;
   const time = ['3h', '24h', '7d', '30d', '1y', '3m', '3y', '5y'];
@@ -47,6 +48,8 @@ const CryptoDetails = () => {
     { title: 'Total Supply', value: `$ ${cryptoDetails?.supply?.total && millify(cryptoDetails?.supply?.total)}`, icon: <ExclamationCircleOutlined /> },
     { title: 'Circulating Supply', value: `$ ${cryptoDetails?.supply?.circulating && millify(cryptoDetails?.supply?.circulating)}`, icon: <ExclamationCircleOutlined /> },
   ];
+
+  console.log('CryptoDetails\'s rendered');
 
   return (
     <Col className='coin-detail-container'>
